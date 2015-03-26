@@ -7,8 +7,11 @@
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes (quote (wombat)))
  '(delete-selection-mode t)
+ '(desktop-save-mode t)
  '(display-time-mode t)
- '(ido-mode (quote buffer) nil (ido))
+ '(ecb-options-version "2.40")
+ '(gdb-enable-debug t)
+ '(gdb-many-windows t)
  '(inhibit-startup-screen t)
  '(reb-re-syntax (quote string))
  '(show-paren-mode t)
@@ -115,3 +118,49 @@
        (interactive "P")
        (let* ((fn-list (dired-get-marked-files nil arg)))
          (mapc 'find-file fn-list)))))
+
+(require 'multiple-cursors)
+(global-set-key (kbd "C-S-q C-S-q") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
+(require 'phi-search)
+(global-set-key (kbd "C-s") 'phi-search)
+(global-set-key (kbd "C-r") 'phi-search-backward)
+
+(require 'phi-replace)
+(global-set-key (kbd "M-%") 'phi-replace-query)
+
+(global-linum-mode)
+
+;repl switcher
+(setq rtog/fullscreen nil)
+(require 'repl-toggle)
+(setq rtog/mode-repl-alist '((js2-mode . nodejs-repl)))
+
+(setq-default indent-tabs-mode nil)
+
+(defmacro with-face (str &rest properties)
+  `(propertize ,str 'face (list ,@properties)))
+
+(defun shk-eshell-prompt ()
+  (let ((header-bg "#fff"))
+    (concat
+     (with-face (concat (eshell/pwd) " ") :background header-bg)
+     (with-face (format-time-string "(%Y-%m-%d %H:%M) " (current-time)) :background header-bg :foreground "#888")
+     (with-face
+      (or (ignore-errors (format "(%s)" (vc-responsible-backend default-directory))) "")
+      :background header-bg)
+     (with-face "\n" :background header-bg)
+     (with-face user-login-name :foreground "blue")
+     "@"
+     (with-face "localhost" :foreground "green")
+     (if (= (user-uid) 0)
+         (with-face " #" :foreground "red")
+       " $")
+     " ")))
+(setq eshell-prompt-function 'shk-eshell-prompt)
+(setq eshell-highlight-prompt nil)
+
+(ido-mode)
