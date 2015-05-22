@@ -5,7 +5,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
+ '(cua-mode t nil (cua-base))
  '(custom-enabled-themes (quote (wombat)))
+ '(custom-safe-themes
+   (quote
+    ("e688cf46fd8d8fcb4e7ad683045fbf314716f184779f3f087ef226a4e170837a" "bede70e4b2654751936d634040347bb4704fa956ecf7dceab03661a75e46a8ca" default)))
  '(delete-selection-mode t)
  '(desktop-save-mode t)
  '(display-time-mode t)
@@ -16,8 +24,8 @@
  '(reb-re-syntax (quote string))
  '(show-paren-mode t)
  '(tool-bar-mode nil)
- '(transient-mark-mode nil)
- '(weather-distance-unit "mile"))
+ '(weather-distance-unit "mile")
+ '(winner-mode t))
 
 (require 'package)
 (add-to-list 'package-archives 
@@ -75,7 +83,7 @@
 
 (global-set-key "\C-m" 'newline-and-indent)
 
-;(add-to-list 'auto-mode-alist (cons (rx ".js" eos) 'js2-mode))
+(add-to-list 'auto-mode-alist (cons (rx ".js" eos) 'js2-mode))
 (add-hook 'js-mode-hook 'js2-minor-mode)
 (add-hook 'js2-mode-hook 'ac-js2-mode)
 
@@ -86,13 +94,6 @@
     (set (make-local-variable 'sgml-basic-offset) 4)))
 
 
-
-;;; auto complete mode
-;;; should be loaded after yasnippet so that they can work together
-(require 'auto-complete)
-(require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
-(ac-config-default)
 ;;; set the trigger key so that it can work together with yasnippet on tab key,
 ;;; if the word exists in yasnippet, pressing tab will cause yasnippet to
 ;;; activate, otherwise, auto-complete will
@@ -100,6 +101,13 @@
 ;(ac-set-trigger-key "<tab>")
 (require 'yasnippet)
 (yas-global-mode 1)
+
+;;; auto complete mode
+;;; should be loaded after yasnippet so that they can work together
+(require 'auto-complete)
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
+(ac-config-default)
 
 
 ;(require 'auto-complete-c-headers)
@@ -135,7 +143,7 @@
 (global-linum-mode)
 
 ;repl switcher
-(setq rtog/fullscreen nil)
+(setq rtog/fullscreen t)
 (require 'repl-toggle)
 (setq rtog/mode-repl-alist '((js2-mode . nodejs-repl)))
 
@@ -144,23 +152,39 @@
 (defmacro with-face (str &rest properties)
   `(propertize ,str 'face (list ,@properties)))
 
-(defun shk-eshell-prompt ()
-  (let ((header-bg "#fff"))
-    (concat
-     (with-face (concat (eshell/pwd) " ") :background header-bg)
-     (with-face (format-time-string "(%Y-%m-%d %H:%M) " (current-time)) :background header-bg :foreground "#888")
-     (with-face
-      (or (ignore-errors (format "(%s)" (vc-responsible-backend default-directory))) "")
-      :background header-bg)
-     (with-face "\n" :background header-bg)
-     (with-face user-login-name :foreground "blue")
-     "@"
-     (with-face "localhost" :foreground "green")
-     (if (= (user-uid) 0)
-         (with-face " #" :foreground "red")
-       " $")
-     " ")))
-(setq eshell-prompt-function 'shk-eshell-prompt)
-(setq eshell-highlight-prompt nil)
+(ido-mode t)
+                                                
+(require 'drag-stuff)                           
+;M-up and down to move lines                    
+(drag-stuff-global-mode t)                      
+(add-to-list 'drag-stuff-except-modes 'org-mode)
 
-(ido-mode)
+(require 'smooth-scroll)
+(smooth-scroll-mode t)
+
+
+;; (when (fboundp 'windmove-default-keybindings)
+;;   (windmove-default-keybindings))
+
+(global-set-key (kbd "C-x TAB") 'switch-window)
+
+;org clock history across emacs sessions
+(setq org-clock-persist 'history)
+(org-clock-persistence-insinuate)
+(org-indent-mode t)
+
+(require 'web-beautify) ;; Not necessary if using ELPA package
+(eval-after-load 'js2-mode
+  '(define-key js2-mode-map (kbd "C-c b") 'web-beautify-js))
+(eval-after-load 'json-mode
+  '(define-key json-mode-map (kbd "C-c b") 'web-beautify-js))
+(eval-after-load 'sgml-mode
+  '(define-key html-mode-map (kbd "C-c b") 'web-beautify-html))
+(eval-after-load 'css-mode
+  '(define-key css-mode-map (kbd "C-c b") 'web-beautify-css))
+
+;mode for writing VM assembly
+(autoload 'vm-mode "~/.emacs.d/vm-mode.el" "" t)
+(add-to-list 'auto-mode-alist '("\\.\\(asm\\|s\\)$" . vm-mode))
+(add-hook 'vm-mode-hook
+          (lambda () (setq-default vm-basic-offset 2)))
