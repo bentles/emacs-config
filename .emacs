@@ -10,6 +10,7 @@
  '(ansi-color-names-vector
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
  '(cua-mode t nil (cua-base))
+ '(cua-rectangle-mark-key [C-c C-r])
  '(custom-enabled-themes (quote (wombat)))
  '(custom-safe-themes
    (quote
@@ -17,12 +18,21 @@
  '(delete-selection-mode t)
  '(desktop-save-mode t)
  '(display-time-mode t)
+ '(ecb-layout-name "left-dir-plus-speedbar")
+ '(ecb-layout-window-sizes
+   (quote
+    (("left-dir-plus-speedbar"
+      (ecb-directories-buffer-name 0.21052631578947367 . 0.5)
+      (ecb-speedbar-buffer-name 0.21052631578947367 . 0.5)))))
  '(ecb-options-version "2.40")
  '(gdb-enable-debug t)
- '(gdb-many-windows t)
+ '(gdb-many-windows nil)
+ '(global-auto-revert-mode t)
  '(inhibit-startup-screen t)
+ '(org-startup-indented t)
  '(reb-re-syntax (quote string))
  '(show-paren-mode t)
+ '(slime-backend "swank-loader.lisp")
  '(tool-bar-mode nil)
  '(weather-distance-unit "mile")
  '(winner-mode t))
@@ -45,9 +55,7 @@
  '(slime-repl-inputed-output-face ((t (:foreground "hot pink"))) t))
 
 ;set up slime and sbcl 
-;(load (expand-file-name "~/quicklisp/slime-helper.el"))
-;; Replace "sbcl" with the path to your implementation
-;(setq inferior-lisp-program "sbcl")
+(setq inferior-lisp-program "/usr/bin/sbcl")
 
 ;;add tab complete
 (setq tab-always-indent 'complete)
@@ -133,14 +141,14 @@
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
-(require 'phi-search)
-(global-set-key (kbd "C-s") 'phi-search)
-(global-set-key (kbd "C-r") 'phi-search-backward)
-
-(require 'phi-replace)
-(global-set-key (kbd "M-%") 'phi-replace-query)
-
-(global-linum-mode)
+;(require 'phi-search)
+;(global-set-key (kbd "C-s") 'phi-search)
+;(global-set-key (kbd "C-r") 'phi-search-backward)
+;
+;(require 'phi-replace)
+;(global-set-key (kbd "M-%") 'phi-replace-query)
+;
+;(global-linum-mode)
 
 ;repl switcher
 (setq rtog/fullscreen t)
@@ -162,7 +170,6 @@
 (require 'smooth-scroll)
 (smooth-scroll-mode t)
 
-
 ;; (when (fboundp 'windmove-default-keybindings)
 ;;   (windmove-default-keybindings))
 
@@ -183,8 +190,62 @@
 (eval-after-load 'css-mode
   '(define-key css-mode-map (kbd "C-c b") 'web-beautify-css))
 
-;mode for writing VM assembly
+;;mode for writing VM assembly
 (autoload 'vm-mode "~/.emacs.d/vm-mode.el" "" t)
 (add-to-list 'auto-mode-alist '("\\.\\(asm\\|s\\)$" . vm-mode))
 (add-hook 'vm-mode-hook
           (lambda () (setq-default vm-basic-offset 2)))
+
+;;Habits from browsers shouldn't have to die when i load emacs
+(defvar killed-file-list nil
+  "List of recently killed files.")
+
+(defun add-file-to-killed-file-list ()
+  "If buffer is associated with a file name, add that file to the
+`killed-file-list' when killing the buffer."
+  (when buffer-file-name
+    (push buffer-file-name killed-file-list)))
+
+(add-hook 'kill-buffer-hook #'add-file-to-killed-file-list)
+
+(defun reopen-killed-file ()
+  "Reopen the most recently killed file, if one exists."
+  (interactive)
+  (when killed-file-list
+    (find-file (pop killed-file-list))))
+
+(define-key global-map (kbd "C-S-t") 'reopen-killed-file)
+
+
+(add-to-list 'load-path "~/quicklisp/dists/quicklisp/software/slime-2.13/")
+(require 'slime-autoloads)
+(setq inferior-lisp-program "/usr/bin/sbcl")
+
+(add-to-list 'load-path "~/.emacs.d/manual/")
+
+;;member functions
+(require 'member-functions)
+(autoload 'expand-member-functions "member-functions" "Expand C++ member function declarations" t)
+(add-hook 'c++-mode-hook (lambda () (local-set-key "\C-cm" #'expand-member-functions)))
+
+(global-set-key [f12] 'compile)
+(global-set-key [f11] 'magit-status)
+
+;;smartest of parens
+(smartparens-global-mode t)
+
+;;semantic in da house
+(require 'cc-mode)
+(require 'semantic)
+
+(global-semanticdb-minor-mode 1)
+(global-semantic-idle-scheduler-mode 1)
+
+(semantic-mode 1)
+
+(add-hook 'c-mode-common-hook
+  (lambda() 
+    (local-set-key  (kbd "C-c <down>") 'ff-find-other-file)))
+
+;;flycheck all the things
+(add-hook 'after-init-hook #'global-flycheck-mode)
