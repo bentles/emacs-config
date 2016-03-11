@@ -1,5 +1,14 @@
 (filesets-init)
 
+(require 'package)
+(add-to-list 'package-archives 
+    '("marmalade" .
+      "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives 
+    '("melpa" .
+      "http://melpa.milkbox.net/packages/"))
+(package-initialize)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -10,14 +19,16 @@
  '(ansi-color-names-vector
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
  '(cua-mode t nil (cua-base))
- '(custom-enabled-themes (quote (wombat)))
+ '(custom-enabled-themes (quote (base16-default-dark)))
  '(custom-safe-themes
    (quote
-    ("e688cf46fd8d8fcb4e7ad683045fbf314716f184779f3f087ef226a4e170837a" "bede70e4b2654751936d634040347bb4704fa956ecf7dceab03661a75e46a8ca" default)))
+    ("0b6645497e51d80eda1d337d6cabe31814d6c381e69491931a688836c16137ed" "e688cf46fd8d8fcb4e7ad683045fbf314716f184779f3f087ef226a4e170837a" "bede70e4b2654751936d634040347bb4704fa956ecf7dceab03661a75e46a8ca" default)))
  '(delete-selection-mode t)
  '(desktop-save-mode t)
  '(display-time-mode t)
  '(ecb-options-version "2.40")
+ '(electric-pair-inhibit-predicate (quote electric-pair-conservative-inhibit))
+ '(electric-pair-mode t)
  '(gdb-enable-debug t)
  '(gdb-many-windows t)
  '(inhibit-startup-screen t)
@@ -27,14 +38,6 @@
  '(weather-distance-unit "mile")
  '(winner-mode t))
 
-(require 'package)
-(add-to-list 'package-archives 
-    '("marmalade" .
-      "http://marmalade-repo.org/packages/"))
-(add-to-list 'package-archives 
-    '("melpa" .
-      "http://melpa.milkbox.net/packages/"))
-(package-initialize)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -140,8 +143,6 @@
 (require 'phi-replace)
 (global-set-key (kbd "M-%") 'phi-replace-query)
 
-(global-linum-mode)
-
 ;repl switcher
 (setq rtog/fullscreen t)
 (require 'repl-toggle)
@@ -188,3 +189,6 @@
 (add-to-list 'auto-mode-alist '("\\.\\(asm\\|s\\)$" . vm-mode))
 (add-hook 'vm-mode-hook
           (lambda () (setq-default vm-basic-offset 2)))
+
+(global-hl-line-mode)
+
