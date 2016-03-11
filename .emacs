@@ -177,7 +177,7 @@
 
 (global-set-key (kbd "C-x TAB") 'switch-window)
 
-org clock history across emacs sessions
+;org clock history across emacs sessions
 (setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
 (org-indent-mode t)
