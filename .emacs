@@ -177,7 +177,7 @@
 
 (global-set-key (kbd "C-x TAB") 'switch-window)
 
-;org clock history across emacs sessions
+org clock history across emacs sessions
 (setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
 (org-indent-mode t)
@@ -226,11 +226,6 @@
 (setq inferior-lisp-program "/usr/bin/sbcl")
 
 (add-to-list 'load-path "~/.emacs.d/manual/")
-
-;;member functions
-(require 'member-functions)
-(autoload 'expand-member-functions "member-functions" "Expand C++ member function declarations" t)
-(add-hook 'c++-mode-hook (lambda () (local-set-key "\C-cm" #'expand-member-functions)))
 
 (global-set-key [f12] 'compile)
 (global-set-key [f11] 'magit-status)
